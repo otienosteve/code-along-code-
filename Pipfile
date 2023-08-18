@@ -9,6 +9,7 @@ pydantic = "*"
 uvicorn = "*"
 sqlalchemy = "*"
 alembic = "*"
+faker = "*"
 
 [dev-packages]
 
