@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from models import session, Student
 
 app = FastAPI()
@@ -17,4 +17,7 @@ def get_all_students():
 @app.get('/students/{id}')
 def get_one_student(id: int):
     #logic to query data for a single student from the database and return results to the user/ client
-    return {'msg':f'student {id}'} 
+    student = session.query(Student).filter_by(id=id).first()
+    if not student:
+        raise HTTPException(status_code=404, detail="Student not found")
+    return student 
