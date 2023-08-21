@@ -1,7 +1,21 @@
 from fastapi import FastAPI, HTTPException
 from models import session, Student
+from pydantic import BaseModel
 
 app = FastAPI()
+
+class StudentSchema(BaseModel):
+    id: int
+    last_name: str
+    first_name: str
+    age: int
+    hometown: str
+    
+    class config:
+        orm_mode= True
+
+
+
 
 @app.get('/')
 def index():
