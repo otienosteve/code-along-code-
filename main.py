@@ -37,3 +37,22 @@ def get_one_student(id: int):
     if not student:
         raise HTTPException(status_code=404, detail="Student not found")
     return student 
+
+@app.post('/students')
+def add_students(payload:StudentSchema):
+    #logic for creating an instance from the payload and adding to the database 
+    student = Student(**dict(payload))
+    session.add(student)
+    session.commit()
+    return {"detail": "Student added SuccessfulLy"}
+ 
+@app.put('/students/{id}')
+def full_update_student(id:int, payload:StudentSchema):
+    # logic to fully update student and persist changes in the database
+    student = session.query(Student).filter_by(id=id).first()
+    if not student:
+        raise HTTPException(status_code=404,detail=f"No student with id {id} was found on our Database")
+    for key,value in payload.dict(exclude_unset=True).items():
+        setattr(student,key, value)
+    session.commit()
+    return {"detail":"student Updated Successfully"}
