@@ -12,7 +12,7 @@ class Student(Base):
     age = Column(Integer, nullable=False)
     home_town = Column(Integer, nullable=False)
 
-    biodata= relationship('BioData', backref='student')
+    biodata= relationship('BioData', backref='student',uselist=False)
     payment = relationship('Payment',backref='student')
 
     def __repr__(self):
