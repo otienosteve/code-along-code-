@@ -16,6 +16,17 @@ class StudentSchema(BaseModel):
     class config:
         orm_mode= True
 
+from typing import Optional
+
+class StudentUpdateSchema(BaseModel):
+    id: Optional[int] = None
+    last_name: Optional[str] = None
+    first_name: Optional[str] = None
+    age: Optional[int] = None
+    home_town: Optional[str] = None
+
+    class config:
+        orm_mode= True
 
 
 
@@ -55,4 +66,26 @@ def full_update_student(id:int, payload:StudentSchema):
     for key,value in payload.dict(exclude_unset=True).items():
         setattr(student,key, value)
     session.commit()
-    return {"detail":"student Updated Successfully"}
+    return {"detail":"student Updated Successfully"}  
+  
+@app.patch('/students/{id}',response_model=StudentSchema)
+def partial_update_student(id:int, payload:StudentUpdateSchema):
+    student = session.query(Student).filter_by(id=id).first()
+
+    if not student:
+        raise HTTPException(status_code=404, detail="Student not Found")
+    
+    for key,value in payload.dict(exclude_unset=True).items():
+        setattr(student, key, value)
+    session.commit()
+
+    return student
+
+@app.delete('/students/{id}')
+def delete_student(id: int):
+    student = session.query(Student).filter_by(id=id).first()
+    if not student:
+        raise HTTPException(status_code=404, detail="Student not found ")
+    session.delete(student)
+    session.commit()
+    return {"detail":f'Student with id {id} has been deleted successfully'}    
