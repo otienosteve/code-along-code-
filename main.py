@@ -8,30 +8,37 @@ from typing import List
 
 app = FastAPI()
 
+class PaymentSchema(BaseModel):
+    amount :float
+    description: str
+    date : datetime
+    student_id: int
+    class config:
+        orm_mode= True
+
 class BioDataSchema(BaseModel):
     aspiration : str
     religion: str
     nationality: str
     highschool: str
     student_id: int
+    
+    class config:
+        orm_mode= True
 
-class PaymentSchema(BaseModel):
-    amount :float
-    description: str
-    date : datetime
-    student_id: int
-
-class ClassSchema(BaseModel):
-    name : str
 class StudentSchema(BaseModel):
     id: int
     last_name: str
     first_name: str
     age: int
     home_town: str
-
+    biodata: BioDataSchema
+    
     class config:
         orm_mode= True
+
+class ClassSchema(BaseModel):
+    name : str
 
 
 from typing import Optional
