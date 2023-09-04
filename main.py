@@ -1,11 +1,28 @@
+from datetime import datetime
+
 from fastapi import FastAPI, HTTPException
-from models import session, Student
+from models import session, Student, Class, Payment, BioData
 from pydantic import BaseModel
 
 from typing import List
 
 app = FastAPI()
 
+class BioDataSchema(BaseModel):
+    aspiration : str
+    religion: str
+    nationality: str
+    highschool: str
+    student_id: int
+
+class PaymentSchema(BaseModel):
+    amount :float
+    description: str
+    date : datetime
+    student_id: int
+
+class ClassSchema(BaseModel):
+    name : str
 class StudentSchema(BaseModel):
     id: int
     last_name: str
@@ -15,6 +32,7 @@ class StudentSchema(BaseModel):
 
     class config:
         orm_mode= True
+
 
 from typing import Optional
 
@@ -27,6 +45,7 @@ class StudentUpdateSchema(BaseModel):
 
     class config:
         orm_mode= True
+
 
 
 
@@ -89,3 +108,18 @@ def delete_student(id: int):
     session.delete(student)
     session.commit()
     return {"detail":f'Student with id {id} has been deleted successfully'}    
+
+@app.get('/student_bio',response_model = List[BioDataSchema])
+def student_bio():
+    biodata = session.query(BioData).all()
+    return biodata  
+
+@app.get('/student_payment',response_model=List[PaymentSchema])
+def student_payment():
+    payments = session.query(Payment).all()
+    return payments  
+
+@app.get('/student_class',response_model=List[ClassSchema])
+def student_class():
+    classes = session.query(Class).all()
+    return classes

@@ -66,7 +66,7 @@ class Class(Base):
     students = relationship('Student', secondary=student_class, back_populates='classes')
 
     def __repr__(self):
-        return f'<Student: {self.name}>'
+        return f'<Class: {self.name}>'
 
 
 engine= create_engine('sqlite:///db.db')

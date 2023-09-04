@@ -49,19 +49,20 @@ students =[]
 students = session.query(Student).all()
 
 for i in range(19):
-    biodata = BioData(aspiration=faker.job(),religion=faker.religion(),nationality=faker.nationality(),highschool=faker.grade(),student=students[i])
+    biodata = BioData(aspiration=faker.job(),religion=faker.religion(),nationality=faker.nationality(),highschool=faker.grade())
     biodata.student = students[i]
+    session.add(biodata)
     session.commit()
 
-for i in range(19):
-    payment = Payment(amount=float(faker.pricetag().replace('$','').replace(',','')),description='tution')
-    payment.student=students[i]
-    session.add(payment)
-    session.commit()
+# for i in range(19):
+#     payment = Payment(amount=float(faker.pricetag().replace('$','').replace(',','')),description='tution')
+#     payment.student=students[i]
+#     session.add(payment)
+#     session.commit()
 
-for i in range(40):
-    class_data=Class(name=faker.class_data())
-    class_data.students.append(students[randint(0,18)])
-    session.add(class_data)
-    session.commit()
+# for i in range(40):
+#     class_data=Class(name=faker.class_data())
+#     class_data.students.append(students[randint(0,18)])
+#     session.add(class_data)
+#     session.commit()
 
