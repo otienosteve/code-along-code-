@@ -1,18 +1,17 @@
 from datetime import datetime
 
 from fastapi import FastAPI, HTTPException
-from models import session, Student, Class, Payment, BioData
+from models import session, Student, Class, Payment, BioData, student_class
 from pydantic import BaseModel
 
-from typing import List
+from typing import List,Optional
 
 app = FastAPI()
 
 class PaymentSchema(BaseModel):
     amount :float
     description: str
-    date : datetime
-    student_id: int
+    date : Optional[datetime] = None
     class config:
         orm_mode= True
 
@@ -25,6 +24,8 @@ class BioDataSchema(BaseModel):
     
     class config:
         orm_mode= True
+class ClassSchema(BaseModel):
+    name : str
 
 class StudentSchema(BaseModel):
     id: int
@@ -33,15 +34,12 @@ class StudentSchema(BaseModel):
     age: int
     home_town: str
     biodata: BioDataSchema
+    payment: List[PaymentSchema]
+    classes: List[ClassSchema]
     
     class config:
         orm_mode= True
 
-class ClassSchema(BaseModel):
-    name : str
-
-
-from typing import Optional
 
 class StudentUpdateSchema(BaseModel):
     id: Optional[int] = None
@@ -129,4 +127,34 @@ def student_payment():
 @app.get('/student_class',response_model=List[ClassSchema])
 def student_class():
     classes = session.query(Class).all()
-    return classes
+    return classes  
+
+@app.post('/add_payment/{id}')
+def add_payment(id:int, payload:PaymentSchema)->PaymentSchema:
+    # query student instance based on id
+    student = session.query(Student).filter_by(id=id).first()
+    # create a new student payment
+    payment = Payment(**payload.dict(exclude_unset=True))
+    # associate payment with a particular student   
+    payment.student = student
+    # persist changes to the database 
+    session.add(payment)
+    session.commit()
+    #response
+    return payment 
+
+@app.post('/add_class/{id}')
+def add_class(id:int, payload:ClassSchema)-> ClassSchema:
+    # query student instance based on id 
+    student = session.query(Student).filter_by(id=id).first()
+    # create a new class 
+    new_class = Class(**payload.dict())
+    # associate class with student.
+    new_class.students.append(student)
+    # persist changes in the database
+    session.add(new_class)
+    session.commit()
+
+    return new_class
+
+
